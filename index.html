@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator Anuitas Modern</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg1: #eef6ff;
+      --bg2: #f5f3ff;
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --secondary: #14b8a6;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --text: #0f172a;
+      --muted: #475569;
+      --card: rgba(255, 255, 255, 0.82);
+      --border: rgba(148, 163, 184, 0.25);
+      --success: #22c55e;
+      --shadow: 0 20px 45px rgba(79, 70, 229, 0.15);
+      --input-bg: rgba(248, 250, 252, 0.9);
+      --table-bg: rgba(255, 255, 255, 0.8);
+      --soft-bg: rgba(15, 23, 42, 0.025);
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg1: #0b1220;
+      --bg2: #111827;
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #2dd4bf;
+      --accent: #fbbf24;
+      --danger: #fb7185;
+      --text: #e5e7eb;
+      --muted: #aab6c8;
+      --card: rgba(17, 24, 39, 0.88);
+      --border: rgba(148, 163, 184, 0.22);
+      --success: #4ade80;
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+      --input-bg: rgba(15, 23, 42, 0.85);
+      --table-bg: rgba(15, 23, 42, 0.85);
+      --soft-bg: rgba(148, 163, 184, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background:
+        radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.16), transparent 25%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 32px 18px;
+    }
+
+    .container {
+      width: min(1100px, 100%);
+      background: var(--soft-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 {
+      color: var(--text);
+      font-size: clamp(1.7rem, 2vw, 2.5rem);
+      letter-spacing: -0.04em;
+    }
+
+    .badge {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .input-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: var(--input-bg);
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus {
+      border-color: rgba(79, 70, 229, 0.6);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+      background: var(--card);
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 14px 26px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-secondary {
+      background: var(--soft-bg);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, rgba(79, 70, 229, 0.05), rgba(20, 184, 166, 0.04));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .stat .label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .stat .value {
+      color: var(--text);
+      font-size: clamp(1.05rem, 2vw, 1.45rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .progress-box {
+      margin-top: 18px;
+      background: var(--soft-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 16px;
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--secondary), var(--primary));
+      border-radius: inherit;
+      transition: width 0.25s ease;
+    }
+
+    .table-card {
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 620px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--table-bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: rgba(15, 23, 42, 0.96);
+      color: #e2e8f0;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      padding: 12px 10px;
+      z-index: 1;
+    }
+
+    tbody td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      font-size: 0.92rem;
+      text-align: right;
+    }
+
+    tbody td:nth-child(1),
+    tbody td:nth-child(2) {
+      text-align: center;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(148, 163, 184, 0.03);
+    }
+
+    tbody tr.payment-row {
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+
+    tbody tr.payment-row:hover {
+      background: rgba(79, 70, 229, 0.09);
+    }
+
+    tbody tr.payment-row.paid-row {
+      background: rgba(20, 184, 166, 0.12);
+    }
+
+    tbody tr.payment-row.paid-row td:first-child::after {
+      content: " ✓";
+      color: #0f766e;
+      font-weight: 800;
+    }
+
+    .text-left {
+      text-align: left !important;
+    }
+
+    .highlight {
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .success {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .theme-toggle { min-width: 132px; }
+    .extra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 22px; }
+    .section-title { color: var(--text); font-size: 1.18rem; margin-bottom: 8px; }
+    .section-desc { color: var(--muted); font-size: .9rem; line-height: 1.55; margin-bottom: 18px; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .mini-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+    .mini-stat { padding: 13px; border: 1px solid var(--border); border-radius: 15px; background: var(--soft-bg); min-width: 0; }
+    .mini-stat span { display:block; color: var(--muted); font-size: .78rem; margin-bottom: 7px; }
+    .mini-stat strong { color: var(--text); font-size: .96rem; overflow-wrap: anywhere; }
+    .compare-table { width:100%; min-width: 0; margin-top: 14px; }
+    .compare-table th { background: var(--soft-bg); color: var(--muted); text-align: left; padding: 11px 9px; font-size: .8rem; }
+    .compare-table td { padding: 12px 9px; border-bottom: 1px solid var(--border); color: var(--text); font-size: .88rem; }
+    .compare-table tr.recommended { background: rgba(20,184,166,.11); }
+    .note { color: var(--muted); font-size: .8rem; line-height: 1.5; margin-top: 12px; }
+    .status-pill { display: inline-block; background: rgba(20,184,166,.14); color: var(--secondary); padding: 4px 8px; border-radius: 999px; font-size: .74rem; font-weight: 800; }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .container {
+        padding: 18px;
+      }
+
+      .button-row, .summary-grid, .extra-grid, .field-grid {
+        grid-template-columns: 1fr;
+      }
+      .mini-results { grid-template-columns: 1fr; }
+
+      .header {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Calculator Anuitas</h1>
+        <p style="color:var(--muted); margin-top:6px;">Rencanakan cicilan dengan simulasi yang lebih jelas.</p>
+      </div>
+      <div class="header-actions">
+        <div class="badge">Modern Loan Planner</div>
+        <button class="btn-secondary theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()">🌙 Mode Gelap</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card input-panel">
+        <div class="form-group">
+          <label for="pinjaman">Jumlah Pinjaman</label>
+          <input id="pinjaman" type="number" value="500000000" min="0" step="1000" />
+        </div>
+
+        <div class="form-group">
+          <label for="bunga">Suku Bunga / Tahun (%)</label>
+          <input id="bunga" type="number" value="12" min="0" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label for="tenor">Jangka Waktu (Bulan)</label>
+          <input id="tenor" type="number" value="24" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label for="sudahBayar">Jumlah Angsuran yang Sudah Dibayar</label>
+          <input id="sudahBayar" type="number" value="0" min="0" step="1"
+                 placeholder="Contoh: 5" />
+          <small style="color: var(--muted); line-height: 1.5;">
+            Masukkan jumlah angsuran yang sudah dibayar, atau klik baris bulan pada tabel.
+          </small>
+        </div>
+
+        <div class="button-row">
+          <button class="btn-primary" onclick="hitungAnuitas()">Hitung</button>
+          <button class="btn-secondary" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="summary-grid">
+          <div class="stat">
+            <span class="label">Angsuran/Bulan</span>
+            <span class="value" id="angsuran">Rp 0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total Dibayar</span>
+            <span class="value" id="totalBayar">Rp 0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total Bunga</span>
+            <span class="value" id="totalBunga">Rp 0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Progress Pelunasan</span>
+            <span class="value" id="progressPelunasan">0%</span>
+          </div>
+        </div>
+
+        <div class="progress-box">
+          <div class="progress-header">
+            <span>Progress pembayaran</span>
+            <strong id="progressText">0%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bulan</th>
+                <th>Angsuran</th>
+                <th>Bunga</th>
+                <th>Pokok</th>
+                <th>Sisa Pinjaman</th>
+                <th>Jumlah Bayar</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody id="tabelAmortisasi">
+              <tr>
+                <td colspan="7" class="text-left" style="padding: 20px; color: var(--muted);">
+                  Data amortisasi akan muncul di sini setelah menghitung.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="extra-grid">
+      <section class="card" aria-labelledby="compareTitle">
+        <h2 class="section-title" id="compareTitle">📊 Perbandingan Pinjaman</h2>
+        <p class="section-desc">Bandingkan beberapa tenor menggunakan jumlah pinjaman dan bunga dari kalkulator utama.</p>
+        <div class="field-grid">
+          <div class="form-group">
+            <label for="tenorA">Tenor opsi A (bulan)</label>
+            <input id="tenorA" type="number" min="1" value="12" />
+          </div>
+          <div class="form-group">
+            <label for="tenorB">Tenor opsi B (bulan)</label>
+            <input id="tenorB" type="number" min="1" value="24" />
+          </div>
+          <div class="form-group">
+            <label for="tenorC">Tenor opsi C (bulan)</label>
+            <input id="tenorC" type="number" min="1" value="36" />
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%; margin-top:14px;" onclick="bandingkanPinjaman()">Bandingkan Opsi</button>
+        <div id="hasilPerbandingan" aria-live="polite">
+          <p class="note">Masukkan tenor lalu tekan “Bandingkan Opsi” untuk melihat estimasi angsuran dan total bunga.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="whatIfTitle">
+        <h2 class="section-title" id="whatIfTitle">🧪 Mode Bagaimana Jika?</h2>
+        <p class="section-desc">Uji skenario alternatif dan bandingkan dengan simulasi utama. Perubahan di sini tidak mengubah data utama.</p>
+        <div class="field-grid">
+          <div class="form-group">
+            <label for="scenarioBunga">Bunga skenario / tahun (%)</label>
+            <input id="scenarioBunga" type="number" min="0" step="0.01" value="10" />
+          </div>
+          <div class="form-group">
+            <label for="scenarioTenor">Tenor skenario (bulan)</label>
+            <input id="scenarioTenor" type="number" min="1" value="36" />
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%; margin-top:14px;" onclick="hitungSkenario()">Uji Skenario</button>
+        <div id="hasilSkenario" aria-live="polite">
+          <p class="note">Coba bunga atau tenor yang berbeda untuk melihat dampaknya.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const formatRupiah = (value) =>
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(value);
+
+    const formatPercent = (value) => `${value.toFixed(2)}%`;
+
+    let jadwalAngsuran = [];
+    let jumlahTenor = 0;
+
+    function hitungAngsuran(pokok, bungaTahunan, tenor) {
+      const r = (bungaTahunan / 100) / 12;
+      const angsuran = r === 0 ? pokok / tenor :
+        (pokok * r * Math.pow(1 + r, tenor)) / (Math.pow(1 + r, tenor) - 1);
+      return { angsuran, totalBayar: angsuran * tenor, totalBunga: angsuran * tenor - pokok };
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle("dark");
+      document.getElementById("themeToggle").textContent = isDark ? "☀️ Mode Terang" : "🌙 Mode Gelap";
+      try { localStorage.setItem("calculatorAnuityTheme", isDark ? "dark" : "light"); } catch (e) {}
+    }
+
+    function muatTema() {
+      try {
+        if (localStorage.getItem("calculatorAnuityTheme") === "dark") {
+          document.body.classList.add("dark");
+          document.getElementById("themeToggle").textContent = "☀️ Mode Terang";
+        }
+      } catch (e) {}
+    }
+
+    function bandingkanPinjaman() {
+      const pokok = Number(document.getElementById("pinjaman").value);
+      const bunga = Number(document.getElementById("bunga").value);
+      const tenors = ["tenorA", "tenorB", "tenorC"].map(id => Number(document.getElementById(id).value));
+      if (!Number.isFinite(pokok) || pokok <= 0 || !Number.isFinite(bunga) || bunga < 0 ||
+          tenors.some(t => !Number.isInteger(t) || t < 1 || t > 600)) {
+        alert("Pastikan pinjaman dan bunga valid serta setiap tenor antara 1–600 bulan.");
+        return;
+      }
+      const hasil = tenors.map((tenor, index) => ({ tenor, index, ...hitungAngsuran(pokok, bunga, tenor) }));
+      const palingRendah = Math.min(...hasil.map(x => x.angsuran));
+      document.getElementById("hasilPerbandingan").innerHTML = `
+        <div class="table-wrap" style="margin-top:14px; max-height:none;">
+          <table class="compare-table"><thead><tr><th>Opsi</th><th>Tenor</th><th>Angsuran/bln</th><th>Total bunga</th></tr></thead>
+          <tbody>${hasil.map(x => `<tr class="${x.angsuran === palingRendah ? "recommended" : ""}"><td>${String.fromCharCode(65+x.index)} ${x.angsuran === palingRendah ? '<span class="status-pill">Cicilan rendah</span>' : ''}</td><td>${x.tenor} bln</td><td><strong>${formatRupiah(x.angsuran)}</strong></td><td>${formatRupiah(x.totalBunga)}</td></tr>`).join("")}</tbody></table>
+        </div>
+        <p class="note">Tenor lebih panjang biasanya menurunkan angsuran bulanan, tetapi dapat meningkatkan total bunga. Perhitungan merupakan estimasi anuitas dengan bunga tetap.</p>`;
+    }
+
+    function hitungSkenario() {
+      const pokok = Number(document.getElementById("pinjaman").value);
+      const bungaUtama = Number(document.getElementById("bunga").value);
+      const tenorUtama = Number(document.getElementById("tenor").value);
+      const bungaSkenario = Number(document.getElementById("scenarioBunga").value);
+      const tenorSkenario = Number(document.getElementById("scenarioTenor").value);
+      if (!Number.isFinite(pokok) || pokok <= 0 || !Number.isFinite(bungaUtama) || bungaUtama < 0 ||
+          !Number.isFinite(tenorUtama) || tenorUtama < 1 || !Number.isFinite(bungaSkenario) || bungaSkenario < 0 ||
+          !Number.isInteger(tenorSkenario) || tenorSkenario < 1 || tenorSkenario > 600) {
+        alert("Periksa kembali pinjaman, bunga, dan tenor. Tenor skenario harus 1–600 bulan.");
+        return;
+      }
+      const dasar = hitungAngsuran(pokok, bungaUtama, tenorUtama);
+      const skenario = hitungAngsuran(pokok, bungaSkenario, tenorSkenario);
+      const bedaAngsuran = skenario.angsuran - dasar.angsuran;
+      const bedaBunga = skenario.totalBunga - dasar.totalBunga;
+      const fmtSelisih = n => `${n > 0 ? "+" : n < 0 ? "−" : ""}${formatRupiah(Math.abs(n))}`;
+      document.getElementById("hasilSkenario").innerHTML = `
+        <div class="mini-results">
+          <div class="mini-stat"><span>Angsuran skenario</span><strong>${formatRupiah(skenario.angsuran)}</strong></div>
+          <div class="mini-stat"><span>Selisih angsuran/bln</span><strong>${fmtSelisih(bedaAngsuran)}</strong></div>
+          <div class="mini-stat"><span>Selisih total bunga</span><strong>${fmtSelisih(bedaBunga)}</strong></div>
+        </div>
+        <p class="note">Skenario: bunga ${bungaSkenario}% per tahun selama ${tenorSkenario} bulan. Pembanding: bunga ${bungaUtama}% selama ${tenorUtama} bulan. Nilai positif berarti lebih tinggi daripada simulasi utama.</p>`;
+    }
+
+    function resetForm() {
+      document.getElementById("pinjaman").value = 500000000;
+      document.getElementById("bunga").value = 12;
+      document.getElementById("tenor").value = 24;
+      document.getElementById("sudahBayar").value = 0;
+      document.getElementById("sudahBayar").max = 24;
+
+      document.getElementById("angsuran").textContent = "Rp 0";
+      document.getElementById("totalBayar").textContent = "Rp 0";
+      document.getElementById("totalBunga").textContent = "Rp 0";
+      document.getElementById("progressPelunasan").textContent = "0%";
+      document.getElementById("progressText").textContent = "0%";
+      document.getElementById("progressFill").style.width = "0%";
+      document.getElementById("tabelAmortisasi").innerHTML = `
+        <tr>
+          <td colspan="7" class="text-left" style="padding: 20px; color: var(--muted);">
+            Data amortisasi akan muncul di sini setelah menghitung.
+          </td>
+        </tr>
+      `;
+      jadwalAngsuran = [];
+      jumlahTenor = 0;
+    }
+
+    function hitungAnuitas() {
+      const pokok = parseFloat(document.getElementById("pinjaman").value);
+      const bungaTahunan = parseFloat(document.getElementById("bunga").value);
+      const tenor = parseInt(document.getElementById("tenor").value, 10);
+
+      if (!Number.isFinite(pokok) || pokok <= 0 ||
+          !Number.isFinite(bungaTahunan) || bungaTahunan < 0 ||
+          !Number.isInteger(tenor) || tenor <= 0) {
+        alert("Masukkan jumlah pinjaman, suku bunga, dan tenor yang valid.");
+        return;
+      }
+
+      const r = (bungaTahunan / 100) / 12;
+      const ringkasan = hitungAngsuran(pokok, bungaTahunan, tenor);
+      const angsuranPerBulan = ringkasan.angsuran;
+      const totalBayar = ringkasan.totalBayar;
+      const totalBunga = ringkasan.totalBunga;
+
+      document.getElementById("angsuran").textContent = formatRupiah(angsuranPerBulan);
+      document.getElementById("totalBayar").textContent = formatRupiah(totalBayar);
+      document.getElementById("totalBunga").textContent = formatRupiah(totalBunga);
+
+      jadwalAngsuran = [];
+      jumlahTenor = tenor;
+      let sisa = pokok;
+      let totalJumlahBayar = 0;
+      let totalPokokDibayar = 0;
+
+      for (let bulan = 1; bulan <= tenor; bulan++) {
+        const saldoAwal = sisa;
+        const bunga = saldoAwal * r;
+        const pokokDibayar = Math.min(Math.max(angsuranPerBulan - bunga, 0), saldoAwal);
+        sisa = Math.max(0, saldoAwal - pokokDibayar);
+        totalJumlahBayar += angsuranPerBulan;
+        totalPokokDibayar += pokokDibayar;
+
+        jadwalAngsuran.push({
+          bulan,
+          angsuran: angsuranPerBulan,
+          bunga,
+          pokok: pokokDibayar,
+          sisa,
+          jumlahBayar: totalJumlahBayar,
+          pokokKumulatif: totalPokokDibayar
+        });
+      }
+
+      const inputSudahBayar = document.getElementById("sudahBayar");
+      inputSudahBayar.max = tenor;
+      inputSudahBayar.value = Math.min(
+        Math.max(parseInt(inputSudahBayar.value, 10) || 0, 0),
+        tenor
+      );
+
+      renderTabel();
+      perbaruiProgres();
+    }
+
+    function renderTabel() {
+      const tbody = document.getElementById("tabelAmortisasi");
+      if (!jadwalAngsuran.length) return;
+
+      tbody.innerHTML = jadwalAngsuran.map((item) => `
+        <tr class="payment-row" data-bulan="${item.bulan}"
+            tabindex="0" role="button"
+            aria-label="Pilih pembayaran sampai bulan ${item.bulan}"
+            title="Klik untuk menandai angsuran sampai bulan ${item.bulan} sudah dibayar">
+          <td>${item.bulan}</td>
+          <td class="highlight">${formatRupiah(item.angsuran)}</td>
+          <td>${formatRupiah(item.bunga)}</td>
+          <td>${formatRupiah(item.pokok)}</td>
+          <td>${formatRupiah(item.sisa)}</td>
+          <td>${formatRupiah(item.jumlahBayar)}</td>
+          <td class="success">${formatPercent((item.pokokKumulatif / parseFloat(document.getElementById("pinjaman").value)) * 100)}</td>
+        </tr>
+      `).join("");
+
+      tbody.querySelectorAll(".payment-row").forEach((row) => {
+        const pilihBaris = () => {
+          document.getElementById("sudahBayar").value = row.dataset.bulan;
+          perbaruiProgres();
+        };
+        row.addEventListener("click", pilihBaris);
+        row.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            pilihBaris();
+          }
+        });
+      });
+    }
+
+    function perbaruiProgres() {
+      if (!jadwalAngsuran.length || jumlahTenor <= 0) return;
+
+      const input = document.getElementById("sudahBayar");
+      let sudahBayar = parseInt(input.value, 10);
+      if (!Number.isFinite(sudahBayar)) sudahBayar = 0;
+      sudahBayar = Math.min(Math.max(sudahBayar, 0), jumlahTenor);
+      input.value = sudahBayar;
+
+      const progresAngsuran = (sudahBayar / jumlahTenor) * 100;
+      const dataTerpilih = sudahBayar > 0 ? jadwalAngsuran[sudahBayar - 1] : null;
+      const pokokAwal = parseFloat(document.getElementById("pinjaman").value);
+      const pokokTerlunasi = dataTerpilih ? dataTerpilih.pokokKumulatif : 0;
+      const progresPokok = pokokAwal > 0 ? (pokokTerlunasi / pokokAwal) * 100 : 0;
+
+      document.getElementById("progressFill").style.width = `${progresAngsuran}%`;
+      document.getElementById("progressText").textContent =
+        `${formatPercent(progresAngsuran)} (${sudahBayar} dari ${jumlahTenor} angsuran)`;
+      document.getElementById("progressPelunasan").textContent = formatPercent(progresPokok);
+
+      document.querySelectorAll("#tabelAmortisasi .payment-row").forEach((row) => {
+        const bulan = Number(row.dataset.bulan);
+        row.classList.toggle("paid-row", bulan <= sudahBayar);
+        row.setAttribute("aria-pressed", bulan <= sudahBayar ? "true" : "false");
+      });
+    }
+
+    document.getElementById("sudahBayar").addEventListener("input", () => {
+      if (jadwalAngsuran.length) perbaruiProgres();
+    });
+
+    document.getElementById("tenor").addEventListener("change", () => {
+      if (jadwalAngsuran.length) hitungAnuitas();
+    });
+
+    muatTema();
+    resetForm();
+  </script>
+</body>
+</html>
